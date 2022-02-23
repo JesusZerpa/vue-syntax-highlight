@@ -1,6 +1,6 @@
 # [PackageDev] target_format: plist, ext: tmLanguage
 ---
-name: Vue Component
+name: Vue Python Component
 scopeName: text.html.vue
 fileTypes: [vue]
 uuid: 5512c10d-4cc5-434c-b8fc-53b912f55ab3
@@ -288,6 +288,19 @@ patterns:
       captures:
         '0': {name: punctuation.definition.comment.js}
     - include: source.js
+
+- name: source.python.embedded.html
+  begin: (<)((?i:script))\b(?![^>]*/>)(?![^>]*(?i:type.?=.?text/((?!python).*)))
+  beginCaptures:
+    '1': {name: punctuation.definition.tag.begin.html}
+    '2': {name: entity.name.tag.script.html}
+  end: (?:\s*\n)?(?<=</(script|SCRIPT))(>)(?:\s*\n)?
+  endCaptures:
+    '2': {name: punctuation.definition.tag.html}
+  patterns:
+
+    - include: source.python
+
 
 - name: meta.tag.structure.any.html
   begin: (</?)((?i:body|head|html)\b)
