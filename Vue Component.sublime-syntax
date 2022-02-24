@@ -1,7 +1,7 @@
 %YAML 1.2
 ---
 extends: Packages/HTML/HTML.sublime-syntax
-name: Vue Component
+name: Vue Python Component
 version: 2
 scope: text.html.vue
 file_extensions:
@@ -338,6 +338,16 @@ contexts:
         - script-close-tag
         - script-javascript-content
 
+  script-python:
+    # for compatibility with ST builds before 4114
+    - meta_scope: meta.tag.script.begin.html
+    - include: script-common
+    - match: '>'
+      scope: punctuation.definition.tag.end.html
+      set:
+        - script-close-tag
+        - script-python-content
+
   script-javascript-content:
     # for compatibility with ST builds before 4114
     - meta_include_prototype: false
@@ -354,6 +364,22 @@ contexts:
         3: source.js.embedded.html
         4: comment.block.html punctuation.definition.comment.end.html
 
+  script-python-content:
+    # for compatibility with ST builds before 4114
+    - meta_include_prototype: false
+    - match: '{{script_content_begin}}'
+      captures:
+        1: comment.block.html punctuation.definition.comment.begin.html
+      pop: 1  # make sure to match only once
+      embed: scope:source.python
+      embed_scope: source.python.embedded.html
+      escape: '{{script_content_end}}'
+      escape_captures:
+        1: source.python.embedded.html
+        2: comment.block.html punctuation.definition.comment.end.html
+        3: source.python.embedded.html
+        4: comment.block.html punctuation.definition.comment.end.html
+
   script-lang-attribute:
     - match: (?i:lang){{attribute_name_break}}
       scope: meta.attribute-with-value.html entity.other.attribute-name.html
@@ -365,7 +391,9 @@ contexts:
       scope: punctuation.separator.key-value.html
       set: script-lang-attribute-value
     - match: (?=\S)
-      set: script-javascript
+      set:
+        - script-javascript
+        - script-python
 
   script-lang-attribute-value:
     - meta_include_prototype: false
@@ -439,6 +467,29 @@ contexts:
                       escape: '{{script_content_end}}'
         - tag-generic-attribute-meta
         - tag-generic-attribute-value
+    - match: (?i)(?=python{{unquoted_attribute_break}}|\'python\'|"python")
+      set:
+        -   - meta_scope: meta.tag.script.begin.html
+            - include: script-common
+            - match: '>'
+              scope: punctuation.definition.tag.end.html
+              set:
+                -   - include: script-close-tag
+                -   - embed_scope: source.python.embedded.html
+                      escape_captures:
+                        1: source.python.embedded.html
+                        2: comment.block.html punctuation.definition.comment.end.html
+                        3: source.python.embedded.html
+                        4: comment.block.html punctuation.definition.comment.end.html
+                      match: '{{script_content_begin}}'
+                      captures:
+                        1: comment.block.html punctuation.definition.comment.begin.html
+                      pop: 1
+                      embed: scope:source.python
+                      escape: '{{script_content_end}}'
+        - tag-generic-attribute-meta
+        - tag-generic-attribute-value
+
     - match: (?=\S)
       set:
         - script-javascript
